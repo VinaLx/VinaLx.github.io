@@ -10,7 +10,7 @@ I would present an overview about monad, and hopefully make it less dreadful as 
 
 I assume readers to have a basic grasp of haskell syntax and a liiiittle experience in programming in functional style, but no math background would be required.
 
-# Haskell Monad Basic 1
+# Let's get started
 
 `Monad` is maybe the most important programming pattern in haskell, the name "Monad" came from mathematic, but it (maybe) doesn't really matter that a programmer doesn't understand what its exact mathematical definition is, so do many other names we came across in haskell.
 
