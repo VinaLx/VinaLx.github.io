@@ -1,7 +1,8 @@
 ---
 layout: post
 title: "Haskell Monad Basic - 1"
-excerpt: motivation, introduction, definition and the "do" notation
+excerpt: motivation, introduction, definition of Monad and the "do" notation
+category: [haskell, functional programming, monad]
 modified: 2017-09-08
 ---
 
