@@ -3,7 +3,7 @@
 # Site wide configuration
 ####################################
 #
-title: Monadic Life
+title: Safely Typed
 email: vinaleux@gmail.com
 description: 
 url: https://vinalx.github.io
@@ -36,7 +36,7 @@ owner:
   name: VinaLx
   avatar: avatar.jpeg
   job: student / novice wizard
-  bio: a functional programming language enthusiast
+  bio: a programming language enthusiast
   email: vinaleux@gmail.com
   disqus-shortname: 
   twitter: #username
