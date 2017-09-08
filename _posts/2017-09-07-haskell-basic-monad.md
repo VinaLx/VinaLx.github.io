@@ -165,4 +165,4 @@ We would go through some basic monads and simple examples in next article
 
 Now what we know about `(>>=)`(or Monad) is that its only purpose is for enabling the `do` notation and greatly improve the readability and simplicity of functional programs. And we can use a imperative programming style while still using pure functional language like haskell. (with certain monad we can even make local variable mutable!).
 
-In this article we introduce the concept of Monad, how it relates to the ordinary `do` notation. And in the following series I will first go through some more simple examples of Monad in haskell, try to give an insight of how monad is introduced, and some more not-that-simple topics.
+In this article we introduce an imprecise, simplified view of Monad, how it relates to the ordinary `do` notation. And in the following series I will first go through some more simple examples of Monad in haskell, try to give an insight of how monad is introduced, and some more not-so-simple topics.
