@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[draft] Haskell Monad Basic - 1"
-excerpt: motivation, introduction, basic usage and the "do" notation
+title: "Haskell Monad Basic - 1"
+excerpt: motivation, introduction, definition and the "do" notation
 modified: 2017-09-08
 ---
 
@@ -16,7 +16,7 @@ I assume readers to have a basic grasp of haskell syntax and a liiiittle experie
 
 ## Motivation
 
-Monad exists everywhere in haskell, we met it when we typed the first (two) lin of haskell program
+Monad exists everywhere in haskell, we met it when we typed the first (two) line of haskell program
 
 ~~~ haskell
 main :: IO ()
@@ -127,20 +127,17 @@ do
     expr
 
 -- will be expanded to
-
 m1 >>= \v1 ->
     m2 >>= \v2 ->
         m3 >>= \v3 -> expr
 
 -- what if no value is extracted?
-
 do
     expr1
     expr2
     expr3
 
 -- could be expanded to
-
 expr1 >>= \_ ->
     expr2 >>= \_ -> expr3
 
@@ -148,4 +145,24 @@ expr1 >>= \_ ->
 expr1 >> expr2 >> expr3
 ~~~
 
-Of course there are other cases like using `let` or pattern matching within `do`, those syntax are much simpler to understand.
+There are other cases like using `let` or pattern matching within `do`, those syntax are much simpler to understand.
+
+the [Monad chapter of Real World Haskell](http://book.realworldhaskell.org/read/monads.html) has a more detailed introduction of `do` notation.
+
+Of course the `do` notation also works for other monads, like `Maybe`:
+
+~~~ haskell
+addIfPresent :: Maybe Int -> Maybe Int -> Maybe Int
+addIfPresent mx my = do
+    x <- mx
+    y <- my
+    return (x + y)
+~~~
+
+We would go through some basic monads and simple examples in next article
+
+## Conclusion
+
+Now what we know about `(>>=)`(or Monad) is that its only purpose is for enabling the `do` notation and greatly improve the readability and simplicity of functional programs. And we can use a imperative programming style while still using pure functional language like haskell. (with certain monad we can even make local variable mutable!).
+
+In this article we introduce the concept of Monad, how it relates to the ordinary `do` notation. And in the following series I will first go through some more simple examples of Monad in haskell, try to give an insight of how monad is introduced, and some more not-that-simple topics.
