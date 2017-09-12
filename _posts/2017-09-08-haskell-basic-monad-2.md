@@ -92,3 +92,120 @@ product xs ys = [(x, y) | x <- xs, y <- ys]
 ~~~
 
 More detailed syntax of list comprehension can be found on [haskell wiki](https://wiki.haskell.org/List_comprehension)
+
+
+### `Maybe`
+
+#### motivation
+
+the `Maybe` type is a super useful tool for type safe error handling. It's defined as:
+
+~~~ haskell
+data Maybe a = Just a | Nothing
+~~~
+
+which basically say an maybe object may or may not has a value of its type parameter. When we want to define some function that can go wrong, we make the function return an `Maybe` object and everyone knows that the function returns `Nothing` as a sign of error.
+
+But something tricky remains, what do we do after getting a "maybe". If there's only one function returns maybe, we're fine, we simply pattern match it and divide the control flow. But considering the following senario.
+
+~~~ haskell
+-- Many steps of the computation can goes wrong...
+actionA :: A -> Maybe B
+actionB :: B -> Maybe C
+actionC :: C -> Maybe D
+
+-- Then how do we implement the action that combine actionA, B, C together
+action :: A -> Maybe D
+
+-- OK let's try pattern matching...
+action a = case actionA a of
+    Just b  -> case actionB b of
+        Just c  -> case actionC c of
+            Just d  -> Just d
+            Nothing -> Nothing
+        Nothing -> Nothing
+    Nothing -> Nothing
+~~~
+
+The senario is quite common in real life, the steps of the large computation can goes wrong individually. And as we see, pattern matching along the way is **definitely not** what we want here. But if we recognize the pattern of this pattern matching process, we find something familiar again.
+
+#### the monad
+
+If we have a function that do all pattern matching for us, that would be good.
+
+~~~ haskell
+(>>=) :: Maybe a -> (a -> Maybe b) -> Maybe b
+~~~
+
+And look at the pattern of the pattern matching above, we observe that when we want to convert some `Maybe` to another `Maybe`, the only way we success is all the computation success, if any of the middle steps goes wrong, we shutdown the whole process since further computation cannot be done.
+
+So what monad can do for us is that
+
+~~~ haskell
+ma >>= f = case ma of
+    Nothing -> Nothing
+    Just a  -> f a
+~~~
+
+And when chaining things together, things go extremely fluent and clean here
+
+~~~ haskell
+actionRefined :: A -> Maybe D
+actionRefined a = do
+    b <- actionA a
+    c <- actionB b
+    actionC c
+~~~
+
+It seems unbelievable, but it's perfectly make sense once you figure it out. Just note that if actionA "goes wrong" and fail to produce some "b" here, actionB and the following would fail to continue as well.
+
+What's extraordinary for maybe monad is that, when we are sequencing operation that may goes wrong, we can only care about the logic of going the right way, and let maybe monad handle the rest of that, shut the computation down at some correct time.
+
+`Maybe` monad, like most kind of monads, emphasizes on sequencing operations within some context. We lift ordinary value to a context where error may happen, and every step of computation, the `Maybe` monad checks the presentation of error and decide whether the computation goes on.
+
+### `Either`
+
+But, despite the "perfectness" of `Maybe`, something is still unsatisfying. When an operation of a sequence of small operation returns `Nothing`, we have no way to know which step of the operation goes wrong outside, which maybe crucial in some senario, we want to produce some reasonable error messages for example.
+
+The reason why this awkward thing happens is that, when error come out, the only way we can represent the error is `Nothing` and nothing else. If we can say more about `Nothing`, that would be good, and here's when `Either` can help.
+
+~~~ haskell
+data Either a b = Left a | Right b
+~~~
+
+Conventionally, we use `Right` to denote the success case, and `Left` to denote the error case. We can choose `String` or whatever type we want to represent errors.
+
+You may wonder how `Either` can be a monad since it has literally two type parameters while monad requires the type has only one. The solution is we can fix the first parameter and make `Either` and the first paramter together a monad instance, and it is defined in this way:
+
+~~~ haskell
+instance Monad (Either e) where
+    -- implementations...
+~~~
+
+And that tells us, basically if we want to handle error with `Either` in a monadic way, we have to fix the type for the "error" for a period of time (throughout the error handling code at least).
+
+There's really nothing new for either monad compares to maybe monad, both monads are for functional style error handling. The last thing we should know about either monad is that, we said either monad can preserve **some** information about errors, it **only preserves the first error information it encounters**. It makes sense because after the first error, the rest of computation never continues just as what maybe monad do.
+
+But either is still not perfect, if we are doing some operations that don't rely on the result of others, we can still preserve **only one** error message. And if we want to provide the functionality that can notify the receiver of the result all the error happens in a bunch of operations, new structure or design would be required.
+
+#### reflection about error handling
+
+At last we settle some subtle questions.
+
+The first is the comparison of maybe and either monad, if either can always preserve more information than maybe do, why would we use maybe at all? The thing is that in many situations when error occurs, we can instantly know when errors should occur, as following examples
+
+~~~ haskell
+div :: (Num n) => n -> n -> Maybe n
+
+index :: Int -> [a] -> Maybe a
+~~~
+
+When we are dividing some numbers and goes wrong, we know that in 90% of the cases that's because the divisor is zero. Similarly, when we index through an array like structure and an `Nothing` is returned, we know it's probably an out of range error. And there are many cases like these, if just `Nothing` itself is perfectly makes sense, why would we bother to look at those error messages or reasons.
+
+The second question is why we use the horrifying monad to handle exceptions and errors, why can't we just throwing exception around and catch them at appropriate places like many imperative languages. This is techniquely not a topic about monad but something more higher level at the "ideas of functional programming". I don't want to talk very much about this right here, in short, not allowing function type signature to lie should be a good thing most of the time.
+
+## Conclusion
+
+We walk through some most basic and useful monads in haskell in this article, and rest of the thing for you just look at the documentation yourself and try to play with those monads in your codes. Although monads in this article themselves are not so complicated, but when "stacked" with other monads as would be introduced in future article, it will be a different thing, so it's important to master these simple things before going further.
+
+In the next article, I will **try to** demystify what `Applicative` in the `Monad` definition and all other related things like `Functor`. I can't explain all the math and theoretical things about where are those terminologies come from, but hopefully give you a most basic idea about what those things are in a functional programming language.
