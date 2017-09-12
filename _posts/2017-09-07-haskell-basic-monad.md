@@ -3,7 +3,7 @@ layout: post
 title: "Haskell Monad Basic - 1"
 excerpt: motivation, introduction, definition of Monad and the "do" notation
 category: [haskell, functional programming, monad]
-modified: 2017-09-08
+modified: 2017-09-12
 ---
 
 This series of articles would be basically my personal study reviews.
@@ -50,7 +50,7 @@ class Num a where
 
 It basically says: if some type `a` has the following operations (`+`, `-`, `*`) defined, then we can treat it as a `Num` (number), and we would be able to write more general function using the `Num` typeclass instead of a specific type which represents some kind of number (`Integer`, `Double` etc.). And not surprisingly, `Integer`, `Double` types are _instances_ of the `Num` type class and define their arithmetic operations.
 
-Recall that `Monad` in haskell is actually a kind of typeclass, which says that: if some type have some Monad like operations, then we can call it a monad. And that's actually the case, we have many monad instances defined in haskell basic library.
+Recall that `Monad` in haskell is actually a typeclass, which says that: if some type have some Monad like operations (and follow certain rules, which cannot be enforced by syntax though), then we can call it a monad. And that's actually the case, we have many monad instances defined in haskell basic library.
 
 ## the Monad definition
 
@@ -65,9 +65,9 @@ class Applicative m => Monad (m :: * -> *) where
   {-# MINIMAL (>>=) #-}
 ~~~
 
-Leave the `Applicative` alone, The `{-# MINIMAL (>>=) #-}` is a pragma that tells the compiler an instance of Monad should define at least `(>>=)` and other methods work well automatically (thanks to the default method implementation of Monad). So in no doubt this `(>>=)` (pronounced as bind) operation is the core of Monad.
+Leaving the `Applicative` aside, which would be explained in later series, the `{-# MINIMAL (>>=) #-}` is a pragma that tells the compiler an instance of Monad should define at least `(>>=)` and other methods work well automatically (thanks to the default method implementation of Monad). So in no doubt this `(>>=)` (pronounced as bind) operation is the core of Monad.
 
-Sadly the signature (type) of `(>>=)` hardly makes sense for new comers. We leave the insight for now. Actually, after expanding the `do` syntactic sugar, what we would see is nested `(>>=)` applications, let's see how it work.
+Sadly the type signature of `(>>=)` hardly makes sense for new comers. We leave the insight for now. Actually, the magic `do` notation we saw in early examples is basically a syntactic sugar of nested `(>>=)` operations, let's see how it works.
 
 ## Interact with `do`
 
@@ -108,7 +108,23 @@ main :: IO ()
 main = readLn >>= \name -> putStrLn ("hello " ++ name)
 ~~~
 
-So here is the most basic rule to expanding "do"
+And this representation using `(>>=)` is equivalent to the code using `do` notation. Although I only give an `IO` example here, the `do` notation works for every other instances of monad as well, like `Maybe`, `List` and so on, like:
+
+~~~ haskell
+addIfPresent :: Maybe Int -> Maybe Int -> Maybe Int
+addIfPresent mx my = do
+    x <- mx
+    y <- my
+    return (x + y)
+~~~
+
+which is expanded to
+
+~~~ haskell
+addIfPresent mx my = mx >>= \x -> my >>= \y -> return (x + y)
+~~~
+
+We would give more simple examples in the next post. And now we introduce the general cases of desugaring `do` notation.
 
 ~~~ haskell
 -- do notation
@@ -142,28 +158,16 @@ do
 expr1 >>= \_ ->
     expr2 >>= \_ -> expr3
 
--- or simply, recall another method of Monad
+-- or simply, recall the method (>>) of Monad
 expr1 >> expr2 >> expr3
 ~~~
 
 There are other cases like using `let` or pattern matching within `do`, those syntax are much simpler to understand.
 
-the [Monad chapter of Real World Haskell](http://book.realworldhaskell.org/read/monads.html) has a more detailed introduction of `do` notation.
-
-Of course the `do` notation also works for other monads, like `Maybe`:
-
-~~~ haskell
-addIfPresent :: Maybe Int -> Maybe Int -> Maybe Int
-addIfPresent mx my = do
-    x <- mx
-    y <- my
-    return (x + y)
-~~~
-
-We would go through some basic monads and simple examples in next article
+the [Monad chapter of Real World Haskell](http://book.realworldhaskell.org/read/monads.html) has a more detailed introduction about `do` notation.
 
 ## Conclusion
 
-Now what we know about `(>>=)`(or Monad) is that its only purpose is for enabling the `do` notation and greatly improve the readability and simplicity of functional programs. And we can use a imperative programming style while still using pure functional language like haskell. (with certain monad we can even make local variable mutable!).
+Now what we know about `(>>=)`(or Monad) is that the only purpose of monad is for enabling the `do` notation and greatly improve the readability and simplicity of functional programs. And we can use a imperative programming style while still using pure functional language like haskell. (with certain monad we can even make local variable mutable!).
 
 In this article we introduce an imprecise, simplified view of Monad, how it relates to the ordinary `do` notation. And in the following series I will first go through some more simple examples of Monad in haskell, try to give an insight of how monad is introduced, and some more not-so-simple topics.
