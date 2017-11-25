@@ -200,7 +200,7 @@ div :: (Num n) => n -> n -> Maybe n
 index :: Int -> [a] -> Maybe a
 ~~~
 
-When we are dividing some numbers and goes wrong, we know that in 90% of the cases that's because the divisor is zero. Similarly, when we index through an array like structure and an `Nothing` is returned, we know it's probably an out of range error. And there are many cases like these, if just `Nothing` itself is perfectly makes sense, why would we bother to look at those error messages or reasons.
+When we are dividing some numbers and goes wrong, we know that in 90% of the cases that's because the divisor is zero. Similarly, when we index through an array like structure and an `Nothing` is returned, we know it's probably an out-of-range error. And there are many cases like these, if just `Nothing` itself is perfectly makes sense, why would we bother to look at those error messages or reasons.
 
 The second question is why we use the horrifying monad to handle exceptions and errors, why can't we just throwing exception around and catch them at appropriate places like many imperative languages. This is techniquely not a topic about monad but something more higher level at the "ideas of functional programming". I don't want to talk very much about this right here, in short, not allowing function type signature to lie should be a good thing most of the time.
 

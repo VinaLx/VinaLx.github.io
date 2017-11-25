@@ -12,11 +12,11 @@ class Applicative m => Monad (m :: * -> *) where
     -- methods...
 ~~~
 
-After two posts, the thing is still unclear is: what is the `Applicative` here? To settle this problem, we first have some quick review on the typeclass syntax of haskell.
+After two articles, there are still something unsettled: what is the `Applicative` here? To understand this one, we first have some quick review on the typeclass syntax of haskell.
 
 ## "Inheritance" of typeclass
 
-In haskell, we can declare an "inheritance" relation over one or multiple typeclasses using type constraint.
+In haskell, we can declare an "inheritance" relation over one or multiple typeclasses using type constraint. Note the "inheritance"s here are always quoted, since it just meant to make beginners with object oriented background easier to understand, and we are not really meaning the "inheritance" in the OO system.
 
 For example, the `Ord` typeclass
 
@@ -32,9 +32,7 @@ class Eq a => Ord a where
   {-# MINIMAL compare | (<=) #-}
 ~~~
 
-The reason we always quote the "inheritance" is that this is not really the concept in object-oriented language, but there are some similarities between them. Here we basically say "If we want to declare an instance of `Ord` for type `a`, there must be an instance for `Eq a`".
-
-Knowing the existance of `Eq a`, we can define default implementation of `Ord` using methods in `Eq`. The whole thing works as if the `Ord` interface is a "subclass" of `Eq` and "inherit" all the methods in `Eq`. And we say, "if `a` is an `Ord`, `a` must be an `Eq`".
+Here we basically say "If we want to declare an instance of `Ord` for type `a`, there must be an instance for `Eq a`". So knowing the existance of `Eq a`, we can define default implementation of `Ord` using methods in `Eq`. The whole thing works as if the `Ord` interface is a "subclass" of `Eq` and "inherit" all the methods in `Eq`. And we say, "if `a` is an `Ord`, `a` must be an `Eq`".
 
 And the same thing apply to `Monad` as well, so the definition above can be read as, "if `a` is a `Monad`, `a` must be an `Applicative`"
 
@@ -63,7 +61,7 @@ In the [last post](/articles/2017-13/haskell-basic-monad-2) we introduced an ide
 
 ## `Functor` for value transformation
 
-The term `Functor` comes from "Category Theory". But in functional programming, functor only means one thing:
+The term `Functor` comes from category theory. But in functional programming, functor only means one thing:
 
 ~~~ haskell
 fmap :: Functor f => (a -> b) -> f a -> f b
@@ -84,7 +82,7 @@ fmap toUpper :: Functor f => f Char -> f Char
 "HELLO FUNCTOR"
 ~~~
 
-that is, we _lift_ the transformation of values to the functor context, such as the list, the maybe etc. And that's all what functor can do.
+that is, we _lift_ the transformation of values to the functor context, such as the `list`, the `maybe` etc. And that's all what functor can do.
 
 The restriction is that the context itself doesn't change at all during the mapping, the length of list doesn't change, `Just` is still a `Just`, `Nothing` is still `Nothing`. This makes sense because what we specified is only how plain values are mapped and know nothing abount the context at all.
 
@@ -95,7 +93,7 @@ And the major limitation of functor is that we can only manipulate one context a
 map2 :: Functor f => (a -> b -> c) -> f a -> f b -> f c
 ~~~
 
-The rationale is that we just promise that we never change the context of functor, but two functors may have different contexts, then what is the context of the result? Functor never knows.
+The rationale is that we just promise that we never change the context of functor, but two functors may have different contexts, then what is the context of the result? Functor just doesn't know.
 
 Careful readers must notice that this operation is provided by the `Applicative`, which gives us some ability to "change" the contexts we have.
 
@@ -145,11 +143,11 @@ Just 3
 Nothing
 ~~~
 
-With applicative functor, we are now able to create new context with old contexts, but is that enough? No! With only applicative, we are not able to implement some useful list manipulation functions like `filter`, or sequencing operations that can go wrong (accept values and return `Maybe`).
+With applicative functor, we are now able to create new context out of old contexts, but is that enough? No! With only applicative, we are not even able to implement many ordinary useful list manipulation functions like `filter`, or sequencing operations that can go wrong (accept values and return `Maybe`).
 
 Why is that? Since applicative only gives us the ability to create contexts in terms of contexts and nothing to do with the value inside, observing that the context of the result is fully determined by the contexts of parameters, no matter what value they contain. So we are not able to generate contexts according to values, but functions like `filter` have to look at values inside the context and determine the resulting context.
 
-And you know what's coming to help, the `Monad`.
+And you know what is coming to help, the `Monad`.
 
 ## `Monad` for generating context
 
@@ -237,9 +235,9 @@ The associativity law looks a lot more complicated. But the name of it explains 
 
 ## Conclusion
 
-In this post we saw the increasing power of context manipulation along the "inheritance chain" of `Monad`. I use the "context" and "value" term all along only for get you some intuition (hopefully) about what what those interfaces are doing, although it may be quite imprecise or completely nonsense in the eyes of mathematicians :P.
+In this article we saw the increasing power of context manipulation along the "inheritance chain" of `Monad`. I use the "context" and "value" term all along only for get you some intuition (hopefully) about what what those interfaces are doing, although it may be quite imprecise or completely nonsense in the view of mathematicians :P.
 
-In the end we present the "laws" that the implementations should follow, although no one including compiler cannot stop you from breaking the laws, but in case of getting strange behavior of your monad, following those laws when implementing your own monad instance maybe a considerably good practice.
+In the end we present the "laws" that the implementations should follow, although no one including compiler cannot stop you from breaking the laws, but in case of getting strange behavior of your monad, following those laws when implementing your own monad instance is considerably a good practice.
 
 There are a lot of things we didn't cover here. To know more about `Applicative` or `Functor`, [this article in haskell wikibook](https://en.wikibooks.org/wiki/Haskell/Applicative_functors) is a good place.
 
