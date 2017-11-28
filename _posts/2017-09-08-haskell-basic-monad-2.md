@@ -3,7 +3,7 @@ layout: post
 modified: 2017-09-08
 title: Haskell Monad Basic - 2
 excerpt: value and context, basic examples on List, Maybe and Either
-category: [haskell, functional programming, monad]
+category: [haskell monad basic]
 ---
 
 In the [last post](/articles/2017-09/haskell-basic-monad) we went through some most basic concepts of Monad in haskell, and sequencing simple IO operations with `do` notation. In this article I would present some other simple and common Monad instances and examples like `List`, `Maybe` and `Either`.

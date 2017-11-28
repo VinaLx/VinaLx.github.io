@@ -3,7 +3,7 @@ layout: post
 title: Haskell Monad Basic - 3
 excerpt: "Monad and its \"super classes\""
 modified: 2017-09-13
-category: [haskell, functional programming, monad]
+category: [haskell monad basic]
 ---
 
 Recall the definition of the monad typeclass:
