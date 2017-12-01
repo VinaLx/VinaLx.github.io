@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Haskell Monad Basic - 4"
-excerpt: Reader, Writer and State (Unfinished)
+excerpt: Reader, Writer and State
 category: [haskell monad basic]
 modified: 2017-11-25
 ---
