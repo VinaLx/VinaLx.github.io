@@ -264,3 +264,132 @@ cencor :: (w -> w) -> Writer w a -> Writer w a
 -- pass transform the output according to the result of computation
 pass :: Writer w (a, w -> w) -> Writer w a
 ```
+
+## State
+
+### Jump right in
+
+Now we can read something, we can write something, you may wonder if there's a monad providing both reading and writing capability, and that's `State`. We can handle mutable states in our program in a purely functional manner with the help of `State`. Let's see how to do it.
+
+`State`, in some sense, is a combination of `Reader` and `Writer`. Its definition also looks like so.
+
+``` haskell
+newtype State s a = State { runState :: s -> (a, s) }
+```
+
+The type signature indicates that a state object is a function that takes the original state and returns the computation result and the new state after the carrying out the computation.
+
+Then let's define its monad instance.
+
+``` haskell
+instance Functor (State s) where
+    fmap f (State sf) = State $ \s -> let (a, s') = sf s in (f a, s')
+    -- or alternatively
+    -- import Data.Bifunctor (first)
+    -- fmap f (State sf) = State $ fmap (first f) sf
+```
+
+The definition consists with more letter, but the idea behind it is simple. `fmap` only maps the result of computation without changing anything. (If you wonder, the alternative definition of `fmap` makes use of the fact that function is a `Functor` and two-tuple is a `Bifunctor`, you may look them up yourself.)
+
+Then we define the `Applicative`.
+
+``` haskell
+instance Applicative (State s) where
+    pure a = State $ \s -> (a, s)
+
+    (State sf) <*> (State sa) = State $ \s ->
+        let (f, s') = sf s
+            (a, s'') = sa s'
+        in  (f a, s'')
+```
+
+`pure` simply makes a constant function that produce constant output and the input state is intact.
+
+The state passing of `(<*>)` should be handle with care, the sequence matters here. We first runs the first state object obtaining the modified state, then we throw the modified state into the second state object obtaining the final state. We can do it in reverse order of course, but passing state from left to right by default is more intuitive. (There _are_ circumstances where defining state reversely makes more sense).
+
+Finally is monad, it should be simple and familiar as you reach here.
+
+``` haskell
+instance Monad (State s) where
+    return = pure
+
+    (State fa) >>= f = State $ \s ->
+        let (a, s') = fa s
+            (State fb) = f a
+        in  fb s' -- (b, s'')
+```
+
+In `(>>=)`, we first run the original state getting the result, and generate another state object yielding `b`, then pass the modified result to it.
+
+### Usage
+
+And since state support both reading and writing, we need them as primitives to deal with states more conveniently. We define two functions `get` and `put` to achieve that. Look at the sigature, see if you can implement them yourself before reading on.
+
+``` haskell
+get :: State s s
+
+put :: s -> State s ()
+```
+
+`get` is similar to `ask` of `Reader`. It direct the input state to the computation result, so that we can extract it in the `do` block (`(>>=)`, actually). `put` set the output state directly ignoring the input state (why can this be useful? The answer should be very obvious).
+
+So here it is:
+
+``` haskell
+get = State $ \s -> (s, s)
+
+put s = State $ const ((), s)
+```
+
+Here's a factorial function illustrating the use of mutable state.
+
+``` haskell
+stateFact :: State (Int, Int) Int
+stateFact = do
+    (count, acc) <- get
+    if count == 0
+        then return acc
+        else do
+            put (count - 1, acc * count)
+            stateFact
+
+fact :: Int -> Int
+fact i | i < 0 = error "negative factorial"
+       | otherwise = fst $ runState stateFact (i, 1)
+```
+
+And finally, there's some other useful utility functions we can define on `State`.
+
+``` haskell
+get :: State s s
+get = State $ \s -> (s, s)
+
+put :: s -> State s ()
+put = modify . const
+
+-- modify state with function
+modify :: (s -> s) -> State s ()
+
+-- again, gets is a generalized version of `get`
+gets :: (s -> a) -> State s a
+```
+
+### Why `Reader` and `Writer` then?
+
+`State` is strictly more powerful than both `Reader` and `Writer`, why not use `State` all the time then? Indeed, yes, while situations where only functionalities of `Reader` or `Writer` are very prevalent, abstracting those situations out should be a wise choice, and when we are writing program, we always wants to use as little abstraction as possible, to promote both readibility and scalibility.
+
+When looking at `Reader`, we are dead sure we **are not able** modify the environment in a way visible to other part of the program. And `State` is a whole another story, which stresses that the execution of program have a rather high chance to modify the state, "you better know what you are doing" when executing a state object.
+
+### Why not `State` all the time then?
+
+As we saw in the example above, we can almost simulate the common imperative language by the mutability `State` provide and the `do` syntax, why not do it all the time then?
+
+You can, of course. But why you are choosing a purely functional language to do this?
+
+## Conclusion
+
+In this post we saw the power of monads that heavily make use of the idea of "context" on which our computation depends. "_computational effect_" decribes such phenomenon, when we are executing program (in this case, monad), we are not only getting the final computation result, but also affect the surrounding environment, and commonly-known "side effects" also falls in this category.
+
+Anyway, we added several useful tools to our toolbox of functional programming, and we should have more confort doing read-world programming.
+
+In next post, I will introduce another very powerful tool of monad, the Monad Transformer, which gaves us the ability to combine different monads and use it as one. And then, the basic monad introduction should come to an end.
