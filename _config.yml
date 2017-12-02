@@ -5,7 +5,7 @@
 #
 title: Safely Typed
 email: vinaleux@gmail.com
-description: 
+description:
 url: https://vinalx.github.io
 keywords: ["Programming"]
 
@@ -35,15 +35,15 @@ kramdown:
 owner:
   name: VinaLx
   avatar: avatar.jpeg
-  job: student / novice wizard
-  bio: a programming language enthusiast
+  job: student
+  bio: a novice wizard
   email: vinaleux@gmail.com
-  disqus-shortname: 
+  disqus-shortname:
   twitter: #username
   facebook: #username
   google:
     plus: #username
-    analytics: 
+    analytics:
     verify:
     ad-client:
     ad-slot:
