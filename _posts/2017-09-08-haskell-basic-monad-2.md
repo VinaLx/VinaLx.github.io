@@ -19,7 +19,7 @@ class Applicative m => Monad (m :: * -> *) where
     -- ... other methods ...
 ~~~
 
-which construct a "trivial" monad object with some certain value. Note that different from many imperative languages, `return` is not a keyword in haskell but a ordinary function. But it's usage expains its name very well, as we will see.
+which constructs a "trivial" monad object with certain value. Note that different from many imperative languages, `return` is not a keyword in haskell but a ordinary function. But its usage expains its name very well, as we will see.
 
 Now we take one step forward, we see monad as a context for value computation or transformation and take some extra _effects_. With this view, `return` is a way that _lifts_ an value from our world to certain monad context. It's not trivial as it looks like at all.
 
@@ -35,7 +35,7 @@ List Monad emphasize less on sequencing some operation but more on the "context"
 
 The list context represents 0 or more value of certain type. The `return` operation is simple, which simply construct a singleton list with that value. For (>>=), since every single value in the context (should) produce a new context, the result becomes the concatenation of every new context produced, that is it allow us to extend (or shrink) the original list on demand, according to the value.
 
-Let's look at an trivial example first:
+Let's look at a trivial example first:
 
 ~~~ haskell
 duplicate :: a -> [a]
@@ -68,7 +68,7 @@ filter p xs = do
 
 Note that in this do notation, what we extract as `x` is **every value** in the list context. So for every value, if `p x` returns `True`, we preserve it, otherwise in the new context we just throw it away.
 
-The list monad is useful also when we are processing more than one list, such as the computing the Cartesian Product of two list.
+The list monad is useful also when we are processing more than one list, such as computing the Cartesian Product of two list.
 
 ~~~ haskell
 product :: [a] -> [b] -> [(a, b)]
@@ -104,12 +104,12 @@ the `Maybe` type is a super useful tool for type safe error handling. It's defin
 data Maybe a = Just a | Nothing
 ~~~
 
-which basically say an maybe object may or may not has a value of its type parameter. When we want to define some function that can go wrong, we make the function return an `Maybe` object and everyone knows that the function returns `Nothing` as a sign of error.
+which basically say a maybe object may or may not has a value of its type parameter. When we want to define some function that can go wrong, we make the function return an `Maybe` object and everyone knows that the function returns `Nothing` as a sign of error.
 
 But something tricky remains, what do we do after getting a "maybe". If there's only one function returns maybe, we're fine, we simply pattern match it and divide the control flow. But considering the following senario.
 
 ~~~ haskell
--- Many steps of the computation can goes wrong...
+-- Many steps of the computation can go wrong...
 actionA :: A -> Maybe B
 actionB :: B -> Maybe C
 actionC :: C -> Maybe D
@@ -127,7 +127,7 @@ action a = case actionA a of
     Nothing -> Nothing
 ~~~
 
-The senario is quite common in real life, the steps of the large computation can goes wrong individually. And as we see, pattern matching along the way is **definitely not** what we want here. But if we recognize the pattern of this pattern matching process, we find something familiar again.
+The senario is quite common in real life, the steps of the large computation can go wrong individually. And as we see, pattern matching along the way is **definitely not** what we want here. But if we recognize the pattern of this pattern matching process, we find something familiar again.
 
 #### the monad
 
@@ -157,7 +157,7 @@ actionRefined a = do
     actionC c
 ~~~
 
-It seems unbelievable, but it's perfectly make sense once you figure it out. Just note that if actionA "goes wrong" and fail to produce some "b" here, actionB and the following would fail to continue as well.
+It seems unbelievable, but it perfectly makes sense once you figure it out. Just note that if actionA "goes wrong" and fail to produce some "b" here, actionB and the following would fail to continue as well.
 
 What's extraordinary for maybe monad is that, when we are sequencing operation that may goes wrong, we can only care about the logic of going the right way, and let maybe monad handle the rest of that, shut the computation down at some correct time.
 
@@ -192,7 +192,7 @@ But either is still not perfect, if we are doing some operations that don't rely
 
 At last we settle some subtle questions.
 
-The first is the comparison of maybe and either monad, if either can always preserve more information than maybe do, why would we use maybe at all? The thing is that in many situations when error occurs, we can instantly know when errors should occur, as following examples
+The first is the comparison of maybe and either monad, if either can always preserve more information than maybe do, why would we use maybe at all? The thing is that in many situations where error occurs, we can instantly know when errors should occur, as following examples
 
 ~~~ haskell
 div :: (Num n) => n -> n -> Maybe n

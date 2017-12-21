@@ -13,7 +13,7 @@ I assume readers to have a basic grasp of haskell syntax and a liiiittle experie
 
 # Let's get started
 
-`Monad` is maybe the most important programming pattern in haskell, the name "Monad" came from mathematic, but it (maybe) doesn't really matter that a programmer doesn't understand what its exact mathematical definition is, so do many other names we came across in haskell.
+`Monad` is maybe the most important programming pattern in haskell, the name "Monad" came from mathematics, but it (maybe) doesn't really matter that a programmer doesn't understand what its exact mathematical definition is, so do many other names we came across in haskell.
 
 ## Motivation
 
@@ -38,7 +38,7 @@ We would delve into this syntax later in this article.
 
 ## Review of typeclass
 
-Type class is a feature of haskell type system which provides a way to describe a class (set) of types which have similar operations. The simplest case the `Num` typeclass:
+Type class is a feature of haskell type system which provides a way to describe a class (set) of types which have similar operations. The simplest case is the `Num` typeclass:
 
 ~~~ haskell
 class Num a where
@@ -168,6 +168,6 @@ the [Monad chapter of Real World Haskell](http://book.realworldhaskell.org/read/
 
 ## Conclusion
 
-Now what we know about `(>>=)`(or Monad) is that the only purpose of monad is for enabling the `do` notation and greatly improve the readability and simplicity of functional programs. And we can use a imperative programming style while still using pure functional language like haskell. (with certain monad we can even make local variable mutable!).
+Now what we know about `(>>=)`(or Monad) is that the only purpose of monad is for enabling the `do` notation and greatly improve the readability and simplicity of functional programs. And we can use an imperative programming style while still using pure functional language like haskell. (with certain monad we can even make local variable mutable!).
 
 In this article we introduce an imprecise, simplified view of Monad, how it relates to the ordinary `do` notation. And in the following series I will first go through some more simple examples of Monad in haskell, try to give an insight of how monad is introduced, and some more not-so-simple topics.
