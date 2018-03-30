@@ -1,15 +1,16 @@
 ---
 layout: post
-title: C++ Style
-excerpt: My C++ coding style based on Google C++ Style Guide
+title: My C++ Style Guide
+excerpt: My C++ coding style mostly based on Google C++ Style Guide
 category: ["C++ language"]
 modified: 2018-03-30
 ---
-# Google C++ Style Digest
+
+# My C++ Style Guide
 
 ## 0. Introduction
 
-This post essentially sorts out the most easy to understand items in [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html). It may contain some minor adjustment to google-style based on my personal taste, but no breaking and fundamental change involving C++ code quality is made.
+This post essentially sorts out the most easy to understand items in [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) and includes some items based on my experiences. It may contain some minor adjustment to google-style based on my personal taste, but no breaking and fundamental change involving C++ code quality is made.
 
 ## 1. Naming
 
