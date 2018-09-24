@@ -34,36 +34,32 @@
     display: block;
   }
   width: 85%;
-  border-bottom: 1px #aaa solid;
+  border-bottom: 1px #ddd solid;
   margin: 0.4em auto 2.3em;
 }
 
 .web-title {
   display: none;
   @include media-query($small-screen) {
-    display: flex;
+    display: block;
   }
   @include media-query($medium-screen) {
-    display: flex;
+    display: block;
   }
-  align-items: center;
-  justify-content: center;
   font-size: 2em;
   font-weight: bold;
-  height: 2em;
   width: 100%;
   margin: 1em auto 0;
   a {
-    color: $warning;
+    color: $thirdary;
     display: block;
     font-size: $font-size-h2;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    &:hover {
-      color: $secondary;
-    }
+    &:hover,
     &:focus {
-      color: darken($secondary, 10%);
+      color: lighten($thirdary, 10%);
+      text-decoration: none;
     }
   }
 }
@@ -80,10 +76,15 @@
   }
   .author_name {
     display: block;
-    color: #F36170;
+    color: $info;
     font-size: 1.75em;
     text-align: center;
     margin-top: 10px;
+    &:hover,
+    &:focus {
+      color: lighten($info, 10%);
+      text-decoration: none;
+    }
   }
   .author_job {
     text-align: center;
@@ -122,6 +123,7 @@
         &:hover,
         &:focus {
           color: lighten($secondary, 14%);
+          text-decoration: none;
         }
       }
     }
@@ -138,20 +140,12 @@
   flex-wrap: wrap;
   .nav-item {
     display: inline-block;
-    text-decoration: underline;
     *display: inline;
     zoom: 1;
     & a {
       margin-top: 1em;
       text-transform: lowercase;
       font-size: 85%;
-      color: $primary;
-      &:hover {
-        color: $secondary;
-      }
-      &:focus {
-        color: darken($secondary, 10%);
-      }
     }
   }
 }
