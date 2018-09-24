@@ -18,7 +18,14 @@ timezone:          Asia/Shanghai
 markdown:          kramdown
 highlighter:       rouge
 excerpt_separator: <!--more-->
-permalink:         /articles/:year-:month/:title
+
+collections:
+  posts:
+    output: true
+    permalink: /articles/:year/:month/:title
+  insite:
+    output: true
+    permalink: /insite/:path
 
 kramdown:
   auto_ids: true
@@ -35,11 +42,11 @@ kramdown:
 owner:
   name: VinaLx
   avatar: avatar.jpeg
-  job: student
-  bio: a novice wizard
+  job: novice wizard
+  bio: PL & music & game lover
   email: vinaleux@gmail.com
   disqus-shortname:
-  twitter: #username
+  twitter: Vinal_Eux
   facebook: #username
   google:
     plus: #username
@@ -48,7 +55,7 @@ owner:
     ad-client:
     ad-slot:
   bing-verify:
-  github: vinalx
+  github: VinaLx
   stackoverflow: #123456/username   from a "http://stackoverflow.com/users/123456/username" link
   linkedin: #username
   xing: #username
