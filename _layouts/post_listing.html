@@ -57,6 +57,10 @@ layout: default
       {% endif %}
     </div><!-- /.image-wrap -->
     {% endif %}
-
 </section>
+
+{% unless loop.last %}
+<div class="post-seperation-rule"></div>
+{% endunless %}
+
 {% endfor %}
