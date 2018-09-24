@@ -26,6 +26,9 @@ collections:
   insite:
     output: true
     permalink: /insite/:path
+  nav:
+    output: true
+    permalink: /:path
 
 kramdown:
   auto_ids: true

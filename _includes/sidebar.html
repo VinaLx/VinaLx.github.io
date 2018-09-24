@@ -12,14 +12,12 @@
       <li class="nav-item">
         <a href="{{ site.url }}/">[ home ] </a>
       </li>
-      {% for page in site.html_pages %}
-        {% unless page.path contains '/' %}
+      {% for page in site.nav %}
         {% if page.title %}
       <li class="nav-item">
         <a href="{{ site.url }}{{ page.url }}">[ {{ page.title }} ] </a>
       </li>
         {% endif %}
-        {% endunless %}
       {% endfor %}
     </ul>
   </nav>
