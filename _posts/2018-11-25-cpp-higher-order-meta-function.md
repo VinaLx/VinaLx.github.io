@@ -27,13 +27,13 @@ void SortDescend(std::vector<int>& v) {
 }
 ```
 
-Here `std::sort` can be considered a higher-order function (not really, since it isn't pure) since the third parameter is a function.
+Here `std::sort` can be considered a higher-order function (not really, it isn't pure) since the third parameter is a function.
 
 ### What is meta-function?
 
 When we refer to "meta-function" in C++, we're usually talking about templates.
 
-Parameters of meta-function is type (or non-type) parametere of templates. And the return value of meta-function is the dependent name inside template. For example:
+Parameters of meta-function is type (or non-type) parameters of templates. And the return value of meta-function is dependent names inside template. For example:
 
 ```cpp
 // normal function
@@ -88,7 +88,7 @@ Most examples in this post, for the sake of clarity, are integer operations. But
 
 ### [`std::integral_constant`](https://en.cppreference.com/w/cpp/types/integral_constant)
 
-This struct defined in `<type_traits>` may become very handy when defining meta-function, and we will be using that a lot in a moment. Here's an equivalent implementation:
+This struct defined in `<type_traits>` may become very handy when defining meta-functions, and we will be using that a lot in a moment. Here's an equivalent implementation of it:
 
 ```cpp
 template <typename Int, Int Value>
@@ -104,7 +104,7 @@ using true_type = bool_constant<true>;
 using false_type = bool_constant<false>;
 ```
 
-So that we can defined our previous `Plus` meta-function as:
+So that we can reimplement our previous `Plus` meta-function as:
 
 ```cpp
 // with public inheritance
@@ -262,7 +262,7 @@ static_assert(
 );
 ```
 
-The `Filter` is similar, but we need to define our "compile-time branching"
+Implementation of `Filter` is very similar, only if we can do "compile-time branching".
 
 ```cpp
 template <bool B, typename IfTrue, typename IfFalse>
