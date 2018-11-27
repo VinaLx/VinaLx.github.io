@@ -22,7 +22,7 @@ And,
 
 $$ \forall X \in \mathcal{C}, Y \in \mathcal{D}. \mathrm {hom} _{\mathcal {C}}(FY,X) \cong \mathrm {hom} _{\mathcal {D}}(Y,GX) $$
 
-Then functor $$ F $$ is left adjoint to $$ G $$, $$ G $$ is right adjoint to $$ F $$.
+Then we say functor $$ F $$ is left adjoint to $$ G $$, $$ G $$ is right adjoint to $$ F $$.
 
 ### Via [Universal Morphisms](https://en.wikipedia.org/wiki/Universal_property)
 
@@ -44,7 +44,7 @@ $$ \forall Y \in ob(D). \exists $$ _initial morphism_ $$ (F(Y), \eta_Y) $$ from 
 
 That is,
 
-$$ \forall Y \in ob(D). \exists \eta_Y : Y \to G(F(Y)). \forall X \in ob(C), g : Y \to G(X). \exists ! f : F(Y) \to X. \eta_y \circ G(f) = g $$
+$$ \forall Y \in ob(D). \exists \eta_Y : Y \to G(F(Y)). \forall X \in ob(C), g : Y \to G(X). \exists ! f : F(Y) \to X. \eta_Y \circ G(f) = g $$
 
 ![right_adjoint_diagram](https://wikimedia.org/api/rest_v1/media/math/render/svg/0a3195dd654be31dc101171065cec60e6c1326ff)
 
@@ -56,9 +56,9 @@ This example is from [an answer on MathOverflow](https://mathoverflow.net/a/5165
 
 > The example I would give a five-year old is the following.
 
-Consider the categories of $$ \mathbb{Z} $$ and $$ \mathbb{R} $$ whose objects are integers and real numbers respectively, morphisms of $$ x \to y $$ exists whenever $ x \le y $.
+Consider the categories of $$ \mathbb{Z} $$ and $$ \mathbb{R} $$ whose objects are integers and real numbers respectively, morphisms of $$ x \to y $$ exists whenever $$ x \le y $$.
 
-For functor $$ inclusion : \mathbb{Z} \to \mathbb{R} $$, the left adjoint of it can be $$ ceiling : \mathbb{R} to \mathbb{Z} $$, the right adjoint of it can be $$ floor : \mathbb{R} to \mathbb{Z} $$
+For functor $$ inclusion : \mathbb{Z} \to \mathbb{R} $$, the left adjoint of it can be $$ ceiling : \mathbb{R} \to \mathbb{Z} $$, the right adjoint of it can be $$ floor : \mathbb{R} \to \mathbb{Z} $$
 
 That is:
 
@@ -70,7 +70,7 @@ $$ x \le y \Leftrightarrow x \le \lfloor y \rfloor $$
 
 Note: if we reverse the order of left and right adjoint (left is floor, right is ceiling), then the equation $$ \lfloor x \rfloor \le y \Leftrightarrow x \le y $$ doesn't always hold (e.g. x = 1.5, y = 1), so does the right adjoint one.
 
-And the property of universal morphisms also express the similar,
+Unsurprisingly, the property of universal morphisms also express the similar idea.
 
 For left adjoint (ceiling), it says: for every real number $$ x $$ whose ceiling is less than or equal to an integer $$ y $$, itself is less than or equal to $$ y $$('s real number form)
 
