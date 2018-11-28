@@ -1,6 +1,6 @@
 ---
 layout: post
-title: [WIP] Lens - Exploring and Learning - 1
+title: "[WIP] Lens - Exploring and Learning - 1"
 excerpt: Introduction / Abstractions of "setter"s and "getter"s.
 category: ["haskell", "lens"]
 modified: 2018-11-28
@@ -140,12 +140,12 @@ It works, but clearly it doesn't look very elegant.
 Interestingly enough, one thing we observed above is that `(r, b)` is actually a functor with respect to `b`. Why does that matter?
 Because now `(r, b) -> (r, t)` suddenly becomes a functor operation (`fmap`), which indicates that what we don't really have to break down the tuple `(r, b)` to get the final result, we just care about the `b -> t` part of it.
 
-Another flaw of this abstraction is, as the type name suggest, it's a setter **and** a getter. 
+Another flaw of this abstraction is, as the type name suggest, it's a setter **and** a getter.
 But it's not very often we want them both **simultaneously**. When we're calling "get", we don't need the setter at all, when we're calling "set", we don't need the getter at all.
 
 ### GetOrSet
 
-Exploiting the functor operation, we can use `Either` instead. 
+Exploiting the functor operation, we can use `Either` instead.
 
 ```haskell
 type GetOrSet r s t a b = (a -> Either r b) -> s -> Either r t
@@ -164,10 +164,31 @@ getRight :: Either a b -> b
 getRight (Right b) = b
 
 get :: GetOrSet a s t a b -> s -> a
-get gos = getLeft . gos (Left . id)
+get gos = getLeft . gos Left
 
 set :: GetOrSet r s t a b -> (a -> b) -> s -> t
 set gos ab = getRight . gos (Right . ab)
 ```
 
--- to be continued...
+Let's try it:
+
+```haskell
+𝝺 > get getOrSetFst (1, 2)
+1
+𝝺 > set getOrSetFst length ("abc", 2)
+(3,2)
+```
+
+Perfect...? Or not. If you look at the type parameters of `get` and `set`, there're still redundancies on type signatures. If I'm using `get`, `t` and `b` is completely useless, similarly, there's certainly no point to write an `r` on the type when using `set`. What can we do to that?
+
+## Type Refinements
+
+Before doing anything, let's sort out what we want to do:
+
+- Get rid of type `b` and `t` in the type of `get`
+- Get rid of type `r` in the type of `set`
+- Provide a consistent interface of `GetOrSet` on which `get` and `set` can call
+
+### Magic of Functors
+
+-- to be continued ...
