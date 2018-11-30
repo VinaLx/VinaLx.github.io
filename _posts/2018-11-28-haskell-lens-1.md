@@ -244,10 +244,16 @@ set :: Setter s t a b -> (a -> b) -> s -> t
 
 set' :: Setter s t a b -> b -> s -> t
 set' setter = set setter . const
+```
 
+```haskell
 𝝺 > set' _1 "abc" (1,2)
 ("abc",2)
 ```
+
+The cool thing is that, since we're using type alias here, any `Lens` can fit into any `Setter` or `Getter` by instantiating the type parameter `f` to different functor types.
+
+But the not-so-cool part of our current type aliases is, `type Lens` doesn't say anything about `functor` although it assumes so, unlike `data` declaration, there's no way adding class constraint to type parameter of type aliases. Or is there?
 
 ### Final Tuning with Existential Quantifier
 
