@@ -223,7 +223,7 @@ instance Functor Identity where
 type Setter s t a b = (a -> Identity b) -> s -> Identity t
 
 set :: Setter s t a b -> (a -> b) -> s -> t
-set setter f = getIdentity . setter (Identity . f)
+set setter f = runIdentity . setter (Identity . f)
 ```
 
 ### `Lens`
@@ -233,15 +233,21 @@ Now the only difference between `Setter` and `Getter` is the type of functor, le
 ```haskell
 type Lens f s t a b = (a -> f b) -> s -> f t
 
-type Setter   = Lens Identity
-type Getter r = Lens (Const r)
+type Setter   s t a b = Lens Identity s t a b
+type Getter r s t a b = Lens (Const r) s t a b
 
 -- setOrGetFst
 _1 :: Functor f => Lens f (x, y) (z, y) x z
-_1 xfz y = flip (,) y <$> xrz x
-```
+_1 xfz (x, y) = flip (,) y <$> xrz x
 
-// TODO: Examples here
+set :: Setter s t a b -> (a -> b) -> s -> t
+
+set' :: Setter s t a b -> b -> s -> t
+set' setter = set setter . const
+
+𝝺 > set' _1 "abc" (1,2)
+("abc",2)
+```
 
 ### Final Tuning with Existential Quantifier
 
