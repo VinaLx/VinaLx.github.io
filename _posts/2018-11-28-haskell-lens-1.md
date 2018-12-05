@@ -257,4 +257,36 @@ But the not-so-cool part of our current type aliases is, `type Lens` doesn't say
 
 ### Final Tuning with Existential Quantifier
 
+To add a functor constraint, we can **NOT** do
+
+```haskell
+type Functor f => Lens f s t a b = ...
+```
+
+But we can do, with [higher-rank polymorphism](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#arbitrary-rank-polymorphism):
+
+```haskell
+{-# LANGUAGE RankNTypes #-}
+
+type LensLike f s t a b = (a -> f b) -> (s -> f t)
+
+type Lens s t a b = forall f. Functor f => LensLike f s t a b
+```
+
+#### Higher-rank polymorphism
+
+I'm not going to delve into higher-rank polymorphism very much here since it's a heavily theoretical concept, but the idea behind it is that, considering the simpliest polymorphic function:
+
+```haskell
+id :: a -> a
+```
+
+What's the actual type of `id`? Well you may say it depends on the actual type of `a`. But we can actually express the polymorphic type of `id` by adding a quantifier of type ([System F](https://en.wikipedia.org/wiki/System_F)).
+
+```haskell
+id :: forall a. a -> a
+```
+
+This way, the type of `id` is a polymorphic type, with rank 1. And most of the time the [parametric polymorphism](https://en.wikipedia.org/wiki/Parametric_polymorphism) we are using is rank 1.
+
 -- to be continued..
