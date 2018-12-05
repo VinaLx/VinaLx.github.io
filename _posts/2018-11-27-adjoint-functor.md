@@ -26,13 +26,13 @@ Then we say functor $$ F $$ is left adjoint to $$ G $$, $$ G $$ is right adjoint
 
 ### Via [Universal Morphisms](https://en.wikipedia.org/wiki/Universal_property)
 
-A funtor $$ F: D \to C $$ is a **left adjoint functor** to functor $$ G : C \to D $$ if: 
+A funtor $$ F: \mathcal{D} \to \mathcal{C} $$ is a **left adjoint functor** to functor $$ G : \mathcal{C} \to \mathcal{D} $$ if: 
 
-$$ \forall X \in ob(C). \exists $$ _terminal morphism_ $$ (G(X), \epsilon_X) $$ from $$ F $$ to $$ X $$.
+$$ \forall X \in \mathrm{ob}(\mathcal{C}). \exists mathrm{TerminalMorphism} (G(X), \epsilon_X) $$ from $$ F $$ to $$ X $$.
 
 That is,
 
-$$ \forall X \in ob(C). \exists \epsilon_X : F(G(X)) \to X. \forall Y \in ob(D), f : F(Y) \to X. \exists ! g : Y \to G(X). F(g) \circ \epsilon_X = f $$
+$$ \forall X \in \mathrm{ob}(\mathcal{C}). \exists \epsilon_X : F(G(X)) \to X. \forall Y \in \mathrm{ob}(D), f : F(Y) \to X. \exists ! g : Y \to G(X). F(g) \circ \epsilon_X = f $$
 
 ![left_adjoint_diagram](https://wikimedia.org/api/rest_v1/media/math/render/svg/44af0381f1f2cc20703f9a55646dc8aa3b0dd14d)
 
@@ -40,11 +40,11 @@ Conversely,
 
 a functor $$ G : C \to D $$ is a **right adjoint functor** to functor $$ F : D \to C $$ if:
 
-$$ \forall Y \in ob(D). \exists $$ _initial morphism_ $$ (F(Y), \eta_Y) $$ from $$ Y $$ to $$ G $$
+$$ \forall Y \in \mathrm{ob}(\mathcal{D}). \exists. \mathrm{InitialMorphism}(F(Y), \eta_Y) $$ from $$ Y $$ to $$ G $$
 
 That is,
 
-$$ \forall Y \in ob(D). \exists \eta_Y : Y \to G(F(Y)). \forall X \in ob(C), g : Y \to G(X). \exists ! f : F(Y) \to X. \eta_Y \circ G(f) = g $$
+$$ \forall Y \in \mathrm{ob}(\mathcal{D}). \exists \eta_Y : Y \to G(F(Y)). \forall X \in \mathrm{ob}(\mathcal{C}), g : Y \to G(X). \exists ! f : F(Y) \to X. \eta_Y \circ G(f) = g $$
 
 ![right_adjoint_diagram](https://wikimedia.org/api/rest_v1/media/math/render/svg/0a3195dd654be31dc101171065cec60e6c1326ff)
 
