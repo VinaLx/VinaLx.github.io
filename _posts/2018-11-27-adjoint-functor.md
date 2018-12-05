@@ -28,7 +28,7 @@ Then we say functor $$ F $$ is left adjoint to $$ G $$, $$ G $$ is right adjoint
 
 A funtor $$ F: \mathcal{D} \to \mathcal{C} $$ is a **left adjoint functor** to functor $$ G : \mathcal{C} \to \mathcal{D} $$ if: 
 
-$$ \forall X \in \mathrm{ob}(\mathcal{C}). \exists mathrm{TerminalMorphism} (G(X), \epsilon_X) $$ from $$ F $$ to $$ X $$.
+$$ \forall X \in \mathrm{ob}(\mathcal{C}). \exists. \mathrm{TerminalMorphism} (G(X), \epsilon_X) $$ from $$ F $$ to $$ X $$.
 
 That is,
 
@@ -38,7 +38,7 @@ $$ \forall X \in \mathrm{ob}(\mathcal{C}). \exists \epsilon_X : F(G(X)) \to X. \
 
 Conversely,
 
-a functor $$ G : C \to D $$ is a **right adjoint functor** to functor $$ F : D \to C $$ if:
+a functor $$ G : \mathcal{C} \to \mathcal{D} $$ is a **right adjoint functor** to functor $$ F : \mathcal{D} \to \mathcal{C} $$ if:
 
 $$ \forall Y \in \mathrm{ob}(\mathcal{D}). \exists. \mathrm{InitialMorphism}(F(Y), \eta_Y) $$ from $$ Y $$ to $$ G $$
 
