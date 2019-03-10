@@ -179,16 +179,114 @@ Let's try it:
 (3,2)
 ```
 
-Perfect...? Or not. If you look at the type parameters of `get` and `set`, there're still redundancies on type signatures. If I'm using `get`, `t` and `b` is completely useless, similarly, there's certainly no point to write an `r` on the type when using `set`. What can we do to that?
+## Type Refinement
 
-## Type Refinements
+Great, but what really annoys me is the `getLeft` and `getRight` call here. Calling an untotal function in functional programming always isn't a good idea.
+But since we know that we will be getting out `Left` if we produce a `Left` and vice versa, we are fine as long as the implementation of `GetOrSet` is reasonable.
 
-Before doing anything, let's sort out what we want to do:
+But anyway, if we think about it, `get` always only use the `Left` and `set` always only use the `Right`, let's step back and try to express that in the type signature of `get` and `set`.
 
-- Get rid of type `b` and `t` in the type of `get`
-- Get rid of type `r` in the type of `set`
-- Provide a consistent interface of `GetOrSet` on which `get` and `set` can call
+### `Const`, the functor that does nothing
 
-### Magic of Functors
+`fmap`ing an `Either` contains a `Left` doesn't do anything. Is there a functor that contains only the `Left` case of `Either`? There is! The `Const` functor:
 
--- to be continued ...
+```haskell
+-- Data.Functor.Const
+newtype Const a b = Const { getConst :: a }
+
+instance Functor (Const a) where
+    fmap _ (Const a) = Const a
+```
+
+That type looks really dumb at first glance, but this turns out to be exactly what we need now! So that the `get` becomes:
+
+```haskell
+type Getter r s t a b = (a -> Const r b) -> s -> Const r t
+
+get :: Getter a s t a b -> s -> a
+get getter = getConst . getter Const
+```
+
+Let's move on to `set`
+
+### `Identity`, the functor of "no functor"
+
+Ignoring the `Left` part of `Either` means ... Eh, if we look back, we don't really need any functor there, `(a -> b) -> s -> t` is just fine. But if you force me to add one, for the greater good...
+
+```haskell
+-- Data.Functor.Identity
+newtype Identity a = Identity { getIdentity :: a }
+
+instance Functor Identity where
+    fmap f (Identity a) = Identity $ f a
+
+type Setter s t a b = (a -> Identity b) -> s -> Identity t
+
+set :: Setter s t a b -> (a -> b) -> s -> t
+set setter f = runIdentity . setter (Identity . f)
+```
+
+### `Lens`
+
+Now the only difference between `Setter` and `Getter` is the type of functor, let's extract that part out as well!
+
+```haskell
+type Lens f s t a b = (a -> f b) -> s -> f t
+
+type Setter   s t a b = Lens Identity s t a b
+type Getter r s t a b = Lens (Const r) s t a b
+
+-- setOrGetFst
+_1 :: Functor f => Lens f (x, y) (z, y) x z
+_1 xfz (x, y) = flip (,) y <$> xrz x
+
+set :: Setter s t a b -> (a -> b) -> s -> t
+
+set' :: Setter s t a b -> b -> s -> t
+set' setter = set setter . const
+```
+
+```haskell
+𝝺 > set' _1 "abc" (1,2)
+("abc",2)
+```
+
+The cool thing is that, since we're using type alias here, any `Lens` can fit into any `Setter` or `Getter` by instantiating the type parameter `f` to different functor types.
+
+But the not-so-cool part of our current type aliases is, `type Lens` doesn't say anything about `functor` although it assumes so, unlike `data` declaration, there's no way adding class constraint to type parameter of type aliases. Or is there?
+
+### Final Tuning with Existential Quantifier
+
+To add a functor constraint, we can **NOT** do
+
+```haskell
+type Functor f => Lens f s t a b = ...
+```
+
+But we can do, with [higher-rank polymorphism](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#arbitrary-rank-polymorphism):
+
+```haskell
+{-# LANGUAGE RankNTypes #-}
+
+type LensLike f s t a b = (a -> f b) -> (s -> f t)
+
+type Lens s t a b = forall f. Functor f => LensLike f s t a b
+```
+
+#### Higher-rank polymorphism
+
+I'm not going to delve into higher-rank polymorphism very much here since it's a heavily theoretical concept, but the idea behind it is that, considering the simpliest polymorphic function:
+
+```haskell
+id :: a -> a
+```
+
+What's the actual type of `id`? Well you may say it depends on the actual type of `a`. But we can actually express the polymorphic type of `id` by adding a quantifier of type ([System F](https://en.wikipedia.org/wiki/System_F)).
+
+```haskell
+id :: forall a. a -> a
+```
+
+This way, the type of `id` is a polymorphic type, with rank 1. And most of the time the [parametric polymorphism](https://en.wikipedia.org/wiki/Parametric_polymorphism) we are using is rank 1.
+
+-- to be continued..
