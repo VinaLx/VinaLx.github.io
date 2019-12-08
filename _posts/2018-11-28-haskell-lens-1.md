@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[WIP] Lens - Exploring and Learning - 1"
+title: "Lens - Exploring and Learning - 1"
 excerpt: Introduction / Abstractions of "setter"s and "getter"s.
 category: ["haskell", "lens"]
 modified: 2018-11-28
@@ -97,8 +97,8 @@ setFst :: Setter (a, b) a
 setSnd :: Setter (a, b) b
 ```
 
-But wait, do I always have to set the sub-object to the same type?
-In this tuple example, the problem become quite obvious, let's fix that.
+But wait, it's not really necessary to always set the sub-object to a value of the same type,
+which is quite obvious in this tuple example.
 
 ```haskell
 type Setter s t a b = (a -> b) -> s -> t
@@ -140,7 +140,7 @@ It works, but clearly it doesn't look very elegant.
 Interestingly enough, one thing we observed above is that `(r, b)` is actually a functor with respect to `b`. Why does that matter?
 Because now `(r, b) -> (r, t)` suddenly becomes a functor operation (`fmap`), which indicates that what we don't really have to break down the tuple `(r, b)` to get the final result, we just care about the `b -> t` part of it.
 
-Another flaw of this abstraction is, as the type name suggest, it's a setter **and** a getter.
+Another problem of this abstraction is, as the type name suggest, it's a setter **and** a getter.
 But it's not very often we want them both **simultaneously**. When we're calling "get", we don't need the setter at all, when we're calling "set", we don't need the getter at all.
 
 ### GetOrSet
@@ -154,7 +154,7 @@ getOrSetFst :: GetOrSet r (x, y) (z, y) x z
 getOrSetFst xrz (x, y) = flip (,) y <$> xrz x -- exact same implementation
 ```
 
-Now it can behaves like a setter or a getter depending on the situation, we are getting there!
+Now it can behave like a setter or a getter depending on the situation, we are getting there!
 
 ```haskell
 getLeft :: Either a b -> a
@@ -181,7 +181,7 @@ Let's try it:
 
 ## Type Refinement
 
-Great, but what really annoys me is the `getLeft` and `getRight` call here. Calling an untotal function in functional programming always isn't a good idea.
+Great, but the use of `getLeft` and `getRight` here is annoying, calling an untotal function in functional programming always isn't a good idea.
 But since we know that we will be getting out `Left` if we produce a `Left` and vice versa, we are fine as long as the implementation of `GetOrSet` is reasonable.
 
 But anyway, if we think about it, `get` always only use the `Left` and `set` always only use the `Right`, let's step back and try to express that in the type signature of `get` and `set`.
@@ -211,7 +211,7 @@ Let's move on to `set`
 
 ### `Identity`, the functor of "no functor"
 
-Ignoring the `Left` part of `Either` means ... Eh, if we look back, we don't really need any functor there, `(a -> b) -> s -> t` is just fine. But if you force me to add one, for the greater good...
+Ignoring the `Left` part of `Either` means ... Eh, if we look back, we don't really need any functor there, `(a -> b) -> s -> t` is just fine. But if we really want to add one, for the greater good... I would say `Identity`.
 
 ```haskell
 -- Data.Functor.Identity
@@ -228,65 +228,93 @@ set setter f = runIdentity . setter (Identity . f)
 
 ### `Lens`
 
-Now the only difference between `Setter` and `Getter` is the type of functor, let's extract that part out as well!
+Now, the instances of `Functor` used by `Setter` and `Getter` is the only difference in the type alias definitions. We could extract it with another type alias:
 
 ```haskell
-type Lens f s t a b = (a -> f b) -> s -> f t
+type LensLike f s t a b = (a -> f b) -> s -> f t
 
-type Setter   s t a b = Lens Identity s t a b
-type Getter r s t a b = Lens (Const r) s t a b
+type Setter   s t a b = LensLike Identity  s t a b
+type Getter r s   a   = LensLike (Const r) s s a a
+```
 
--- setOrGetFst
-_1 :: Functor f => Lens f (x, y) (z, y) x z
-_1 xfz (x, y) = flip (,) y <$> xrz x
+However, this way we lose the information that `f` is required to be a `Functor`,
+but we can NOT add a type class constraint to the `type` alias definition like `type Functor f => Lens f ...`.
 
+What we could make use of the [`RankNTypes`](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#arbitrary-rank-polymorphism) language extension, and completely abstract out the type parameter
+in the head of the declaration to the body of type like so:
+
+```haskell
+type Lens s t a b = forall f. Functor f => LensLike f s t a b
+
+-- `setOrGetFst` with exactly the same implementation
+_1 :: Lens (x, y) (z, y) x z
+_1 f (x, y) = flip (,) y <$> f x
+
+-- same definition as above
 set :: Setter s t a b -> (a -> b) -> s -> t
 
 set' :: Setter s t a b -> b -> s -> t
 set' setter = set setter . const
 ```
 
-```haskell
-𝝺 > set' _1 "abc" (1,2)
-("abc",2)
-```
-
-The cool thing is that, since we're using type alias here, any `Lens` can fit into any `Setter` or `Getter` by instantiating the type parameter `f` to different functor types.
-
-But the not-so-cool part of our current type aliases is, `type Lens` doesn't say anything about `functor` although it assumes so, unlike `data` declaration, there's no way adding class constraint to type parameter of type aliases. Or is there?
-
-### Final Tuning with Existential Quantifier
-
-To add a functor constraint, we can **NOT** do
+With `RandNTypes`, we don't even mention the type parameter `f` in `_1`,
+because the `f` is abtracted out directly in the type, and is no longer a
+"type variable" of the type alias. And we could still use a `Lens` as a `Setter`
+or `Getter` like so:
 
 ```haskell
-type Functor f => Lens f s t a b = ...
+𝝺> set _1 (+1) (1, 'a')
+(2,'a')
+
+𝝺> get _1 (+1) (1, 'a')
+2
 ```
 
-But we can do, with [higher-rank polymorphism](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#arbitrary-rank-polymorphism):
+During type checking, ghc notices that the type `forall f. Functor f => (a -> f b) -> (s -> f t)`
+is compatible to both type `(a -> Identity b) -> (s -> Identity t)` and `(a -> Const r a) -> (s -> Const r s)`,
+because both `Identity` and `Const` are functors, which satisfy the `Functor` constraint in the `forall` quantified type.
+
+## Back to Reality
+
+Now we "almost" achieve what we saw before, we have a clean design of `Setter` and `Getter` type and both of which related to `Lens`, we didn't quite obey the naming in the implementation in the library, and some types have _slightly_ different signatures.
+
+The actual type signatures are defined in
+
+- [`Control.Lens.Getter`](http://hackage.haskell.org/package/lens-4.18.1/docs/Control-Lens-Getter.html)
+- [`Control.Lens.Setter`](http://hackage.haskell.org/package/lens-4.18.1/docs/Control-Lens-Setter.html)
+- [`Control.Lens.Lens`](http://hackage.haskell.org/package/lens-4.18.1/docs/Control-Lens-Lens.html)
 
 ```haskell
-{-# LANGUAGE RankNTypes #-}
+type Lens s t a b = forall f. Functor f => (a -> f b) -> s -> f t
+type Lens' s a = Lens s s a a
 
-type LensLike f s t a b = (a -> f b) -> (s -> f t)
+type LensLike f s t a b = (a -> f b) -> s -> f t
+type LensLike' f s a = LensLike f s s a a
 
-type Lens s t a b = forall f. Functor f => LensLike f s t a b
+-- `Settable` constraint is mostly talking about `Identity`
+type Setter s t a b = forall f. Settable f => (a -> f b) -> s -> f t
+type Setter' s a = Setter s s a a
+
+type ASetter s t a b = (a -> Identity b) -> s -> Identity t
+-- `set` in our article
+over :: ASetter s t a b -> (a -> b) -> s -> t
+-- `set'` in our article
+set :: ASetter s t a b -> b -> s -> t
+
+-- `Getter` in our article
+type Getting r s a = (a -> Const r a) -> s -> Const r s
+-- again, the constraint is mostly talking about `Const`
+type Getter s a = forall f. (Contravariant f, Functor f) => (a -> f a) -> s -> f s
+
+-- a simple "getter"
+(^.) :: s -> Getting a s a -> a
+
+-- some magic combined with (.^) to obtain a behavior of `get` in our article
+to :: (Profunctor p, Contravariant f) => (s -> a) -> Optic' p f s a
 ```
 
-#### Higher-rank polymorphism
+## Conclusion
 
-I'm not going to delve into higher-rank polymorphism very much here since it's a heavily theoretical concept, but the idea behind it is that, considering the simpliest polymorphic function:
-
-```haskell
-id :: a -> a
-```
-
-What's the actual type of `id`? Well you may say it depends on the actual type of `a`. But we can actually express the polymorphic type of `id` by adding a quantifier of type ([System F](https://en.wikipedia.org/wiki/System_F)).
-
-```haskell
-id :: forall a. a -> a
-```
-
-This way, the type of `id` is a polymorphic type, with rank 1. And most of the time the [parametric polymorphism](https://en.wikipedia.org/wiki/Parametric_polymorphism) we are using is rank 1.
-
--- to be continued..
+In this article, we kinda "derived" the design of `Lens` informally, and in the next article
+we would explore something left by this article, the composition of lenses,
+and some magic constraints (like `Contravariant`) in the real implementation.
