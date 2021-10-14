@@ -4,14 +4,17 @@
 {% include head.html %}
 
 <body>
-  <div class="row">
+  <div class="page-wrapper">
     <!-- less than 1/4 and greater than 1/5 -->
-    <div class="col s40 m9">
+    <!-- <div class="col s40 m9"> -->
+    <div class="cover-wrapper">
       <div class="table cover">
         {% include sidebar.html %}
       </div>
     </div>
-    <div class="col s40 m31">
+    <!-- </div> -->
+    <!-- <div class="col s40 m31"> -->
+    <div class="post-wrapper">
       <div class="post-listing">
         {{ content }}
         {% include footer.html %}
