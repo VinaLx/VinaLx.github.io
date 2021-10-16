@@ -3,7 +3,7 @@ layout: post
 title: "Well-founded Recursion"
 excerpt: "Generalizing structural recursion for languages with termination checker, part 1"
 category: ["recursion", "induction", "type theory"]
-modified: 2020-05-06
+modified: 2021-10-01
 ---
 
 ## Introduction
